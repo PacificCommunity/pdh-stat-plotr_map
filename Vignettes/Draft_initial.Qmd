@@ -29,3 +29,14 @@ raw_data |>
 
 geographic info is in `GEO_PICT`, values to plot in `obsValue`.
 
+The api of the plotting function should be something like
+
+```{txt}
+raw_data |>
+    plot_map()
+```
+
+For this to happen, `plot_map()` needs to be able to
+- understand the GEO_PICT codelist (it's in /assets)
+- group by indicators
+- decide what to do about aggregation
