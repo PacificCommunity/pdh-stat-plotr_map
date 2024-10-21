@@ -11,3 +11,21 @@ We read energy indicators from here https://stats-sdmx-disseminate.pacificdata.o
 library(tidyverse)
 library(rsdmx)
 ```
+
+
+# do plotting
+
+```{r}
+url_data <- "https://stats-sdmx-disseminate.pacificdata.org/rest/data/SPC,DF_ENERGY,1.0/A...?startPeriod=2013&endPeriod=2019&dimensionAtObservation=AllDimensions"
+
+raw_data <- readSDMX(url_data) |>
+    as_tibble()
+```
+
+```{r}
+raw_data |>
+    glimpse()
+```
+
+geographic info is in `GEO_PICT`, values to plot in `obsValue`.
+
