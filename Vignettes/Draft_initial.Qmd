@@ -10,10 +10,15 @@ We read energy indicators from here https://stats-sdmx-disseminate.pacificdata.o
 ```{r}
 library(tidyverse)
 library(rsdmx)
+library(sf)
+library(ggiraph)
 ```
 
+```{r}
+source("R/ellis_plot.R")
+```
 
-# do plotting
+# get data
 
 ```{r}
 url_data <- "https://stats-sdmx-disseminate.pacificdata.org/rest/data/SPC,DF_ENERGY,1.0/A...?startPeriod=2013&endPeriod=2019&dimensionAtObservation=AllDimensions"
@@ -40,3 +45,37 @@ For this to happen, `plot_map()` needs to be able to
 - understand the GEO_PICT codelist (it's in /assets)
 - group by indicators
 - decide what to do about aggregation
+
+```{r}
+load(file = "assets/pac_map_sf.rda")
+load(file = "assets/country_borders_tb.rda")
+```
+
+```{r}
+raw_data |>
+    rename(geo_pict = GEO_PICT) |>
+    filter(INDICATOR == "ENERGY_IND_017") |>
+draw_pac_map(join_col = "geo_pict", fill_col = "obsValue") +
+   scale_fill_viridis_c() +
+   labs(title = "Some random variables",
+   fill = "")
+```
+
+```{r}
+g <- raw_data |>
+    rename(geo_pict = GEO_PICT) |>
+    filter(INDICATOR == "ENERGY_IND_017") |>
+prepare_data_for_plotting() |>
+ggplot() +
+  geom_polygon_interactive(
+    color='black',
+    aes(long, lat, group=group, fill=obsValue,
+        tooltip=sprintf("value = %s",obsValue))) +
+ hrbrthemes::theme_ipsum() +
+  colormap::scale_fill_colormap(
+    colormap=colormap::colormaps$copper, reverse = T) +
+  labs(title='Internet Usage in Africa in 2015', subtitle='As Percent of Population',
+       caption='Source: World Bank Open Data.')
+
+widgetframe::frameWidget(ggiraph(code=print(g)))
+```
