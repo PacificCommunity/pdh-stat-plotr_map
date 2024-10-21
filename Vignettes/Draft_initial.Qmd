@@ -1,0 +1,13 @@
+---
+title: "Untitled"
+format: html
+---
+
+We read energy indicators from here https://stats-sdmx-disseminate.pacificdata.org/rest/data/SPC,DF_ENERGY,1.0/A...?startPeriod=2013&endPeriod=2019&dimensionAtObservation=AllDimensions
+
+# load weaponry
+
+```{r}
+library(tidyverse)
+library(rsdmx)
+```
