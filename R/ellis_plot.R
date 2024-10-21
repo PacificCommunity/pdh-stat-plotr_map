@@ -86,7 +86,7 @@ draw_pac_map <- function(fill_df = NULL, join_col = "geo_pict", fill_col = NULL,
                  aes(x = .data$long, y = .data$lat, group = .data$group),
                  fill = "white",
                  alpha = 0.8) +
-    ggplot2::geom_sf(data = frs::international_date_line_sf, colour = idl_col, linetype = 1, alpha = 0.5) +
+   # ggplot2::geom_sf(data = international_date_line_sf, colour = idl_col, linetype = 1, alpha = 0.5) +
     annotate("text", x = 182, y = 38, label = "International date line", 
              colour = idl_col, hjust = 0, family = family, size = idl_label_size) 
   
@@ -109,4 +109,40 @@ draw_pac_map <- function(fill_df = NULL, join_col = "geo_pict", fill_col = NULL,
          fill = fill_col_label)
   
   return(m1)  
+}
+
+
+
+prepare_data_for_plotting <- function(fill_df = NULL, join_col = "geo_pict", fill_col = NULL, 
+                         fill_col_label = fill_col,
+                         base_size = 11,
+                         xlim = c(120, 240), ylim = c(-50, 50),
+                         country_labels = TRUE,
+                         country_label_size = 3, country_label_col = "black",
+                         idl_col = "steelblue", idl_label_size = country_label_size, 
+                         leg_pos = c(0.8, 0.7), ocean_col = "lightsteelblue",
+                         family = "sans"){
+  
+  # this is a bit of a hack so I can import from sf and use all of the sf methods
+  # for tidyverse objects without generating a note in the CRAN checks. There must
+  # be a better way to use the sf methods! but
+  if(!all(sf::st_is_valid(pac_map_sf))){
+    stop("pac_map_sf has in valid geometry")
+  }
+  
+  if(is.null(fill_df)){
+    m0 <-  ggplot2::ggplot(pac_map_sf) +
+      ggplot2::geom_sf(colour = "grey70", alpha = 0.9) 
+    
+  } else {
+    d <- dplyr::left_join(pac_map_sf, fill_df, by = join_col)
+    
+    if(nrow(d) != nrow(pac_map_sf)){
+      warning("Some extra rows in pac_map_sf introduced when trying to join to fill_df")
+    }
+    
+    d$fill_col <- dplyr::pull(d, fill_col)
+  }
+
+  return(d)
 }
